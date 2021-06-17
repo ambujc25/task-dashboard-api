@@ -1,0 +1,13 @@
+extends layout
+
+block content
+  h1= title
+  
+  form(method="POST", action="")
+    label(for='email') Username: 
+    input#email(type='email', name='email', value='')
+
+    label(for='password') Password: 
+    input#password(type='password', name='password', value='')
+
+    button(type='submit') Submit

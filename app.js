@@ -4,16 +4,24 @@ var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 
+const passport = require('passport');
+
+require('./auth/auth');
+
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
 var managerRouter = require('./routes/manager');
 var taskRouter = require('./routes/task');
 var workerRouter = require('./routes/worker');
+var secureManagerRouter = require('./routes/manager_loggedIn');
+var secureWorkerRouter = require('./routes/worker_loggedIn');
+
+var Manager = require('./models/Manager');
 
 var app = express();
 
 var mongoose = require('mongoose');
-var mongoDB = 'mongodb+srv://jil25:@cluster0.4cipe.mongodb.net/netmeds_assignment?retryWrites=true&w=majority';
+var mongoDB = 'mongodb+srv://jil25:moserbaer@cluster0.4cipe.mongodb.net/netmeds_assignment?retryWrites=true&w=majority';
 
 mongoose.connect(mongoDB, { useNewUrlParser: true, useUnifiedTopology: true });
 var db = mongoose.connection;
@@ -33,8 +41,10 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
 app.use('/manager', managerRouter);
+app.use('/manager/logged', passport.authenticate('jwt', {session: false}), secureManagerRouter);
 app.use('/task', taskRouter);
 app.use('/worker', workerRouter);
+app.use('/worker/logged', passport.authenticate('jwt', {session: false}), secureWorkerRouter);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

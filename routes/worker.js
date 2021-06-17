@@ -12,4 +12,8 @@ router.get('/get/:id', workerController.worker_get_specific);
 //Add a worker
 router.post('/add', workerController.worker_create_post);
 
+//Login and get token
+router.post('/login', workerController.worker_login_post);
+
+
 module.exports = router;

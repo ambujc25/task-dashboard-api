@@ -15,7 +15,7 @@ var TaskSchema = new Schema({
     points: {type: Number},
 
     //Workers working on this task
-    workers: [{type: Schema.Types.ObjectId, ref:'Worker'}],
+    worker: {type: Schema.Types.ObjectId, ref:'Worker'},
 
     status: {type: String, enum: ['Approved', 'Rejected']}
 });
