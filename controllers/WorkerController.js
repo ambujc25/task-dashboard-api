@@ -8,6 +8,22 @@ const passport = require('passport');
 
 require('../auth/auth');
 
+exports.worker_create_post = function(req,res,next){
+
+    var worker = new Worker({
+        first_name: req.query.first_name,
+        last_name: req.query.last_name,
+        email: req.query.email,
+        password: req.query.password
+    });
+      
+    worker.save(function(err){
+        if(err){ return next(err); }
+        res.json({'worker': "signed up"})
+    })
+      
+}
+
 exports.worker_get_all = function(req,res,next){
     Worker.find()
     .sort([['first_name','ascending']])
@@ -28,7 +44,7 @@ exports.worker_get_specific = function(req,res,next){
     })
 }
 
-exports.worker_create_post = function(req,res,next){
+/*exports.worker_create_post = function(req,res,next){
     var worker = new Worker({
         first_name: 'Rohan',
         last_name: 'Joshi',
@@ -41,7 +57,7 @@ exports.worker_create_post = function(req,res,next){
         if(err){return next(err);}
         res.redirect('/');
     })
-}
+}*/
 
 
   
@@ -52,6 +68,7 @@ exports.worker_login_post = async function(req,res,next){
         try{
             if(err || !user){
                 const error = new Error('An error occurred.');
+                res.json({"Credentials": "Incorrect"});
                 return next(error);
             }
 
@@ -110,7 +127,7 @@ exports.secure_worker_solve_task = function(req,res,next){
 
         Task.findByIdAndUpdate(req.params.id, newTask, {}, function(err, nTask){
             if(err){ return next(err); }
-            res.send('Task solution uploaded successfully');
+            res.json({'Task solution': 'uploaded successfully'});
         })
   })
 }
@@ -120,7 +137,7 @@ exports.secure_worker_select_task = function(req,res,next){
     .exec(function(err,task){
         if(err){ return next(err); }
         if(!task){
-            res.send('Task could not be found');
+            res.json({'task': 'could not be found'});
             return;
         }
         
@@ -165,7 +182,7 @@ exports.secure_worker_select_task = function(req,res,next){
 
         Task.findByIdAndUpdate(req.params.id, newTask, {}, function(err, nTask){
             if(err){ return next(err); }
-            res.send('Selected task successfully');
+            res.json({'task': "selected"});
         })
     })
 

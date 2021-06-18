@@ -15,4 +15,7 @@ router.post('/add_task', managerController.secure_manager_create_task);
 //Correct the task submitted by worker
 router.post('/check_task/:id', managerController.secure_manager_check_task);
 
+//Delete task
+router.post('/delete_task/:id', managerController.secure_manager_delete_post);
+
 module.exports = router;

@@ -6,7 +6,7 @@ var WorkerSchema = new Schema({
     first_name: {type: String, required: true, maxLength: 100},
     last_name: {type: String, required: true, maxLength: 100},
     tasks_doing: [{type: Schema.Types.ObjectId, ref: 'Task'}],
-    email: {type: String, required: true, unique: true},
+    email: {type: String, required: true},
     password: {type: String, required: true}
 });
 

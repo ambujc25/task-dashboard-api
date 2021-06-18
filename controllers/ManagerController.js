@@ -1,5 +1,6 @@
 var Manager = require('../models/Manager');
 var Task = require('../models/Task');
+var Worker = require('../models/Worker');
 
 var jwt = require('jsonwebtoken');
 
@@ -30,33 +31,22 @@ exports.manager_get_specific = function(req,res,next){
     })
 }
 
-exports.manager_create_post = [
-    body('first_name').trim().isLength({min: 1}).escape().withMessage('First Name should be specified').isAlphanumeric().withMessage('Name should be alphanumeric'),
-    body('last_name').trim().isLength({min: 1}).escape().withMessage('FLast Name should be specified').isAlphanumeric().withMessage('Name should be alphanumeric'),
-    body('email').trim().isLength({min: 1}).withMessage('Email should be specified').isEmail().withMessage("Should be an email"),
-    body('password').isLength({min: 6}).withMessage('Password should be greater than 6 letters').isStrongPassword().withMessage('Password should be strong'),
+exports.manager_create_post = function(req,res,next){
+
+   
+    var manager = new Manager({
+      first_name: req.query.first_name,
+      last_name: req.query.last_name,
+      email: req.query.email,
+      password: req.query.password,
+    });
   
-    (req,res,next) => {
-      const errors = ValidationResult(req);
-  
-      if(!errors.isEmpty()){
-        res.redirect('/manager/add');
-        return;
-      }else{
-        var manager = new Manager({
-          first_name: 'Ambuj',
-          last_name: 'Chauhan',
-          email: 'ambuj@gmail.com',
-          password: '12345'
-        });
-      
-        manager.save(function(err){
-          if(err){ return next(err); }
-          res.redirect(manager.url);
-        })
-      }
-    }
-];
+    manager.save(function(err){
+      if(err){ return next(err); }
+      res.json({"manager": "registered"});
+    })
+    
+}
 
 exports.manager_login_get = function(req,res,next){
   res.render('login', {title: 'Login'});
@@ -69,6 +59,7 @@ exports.manager_login_post = async function(req,res,next){
     try{
       if(err || !user){
         const error = new Error('An error occurred.');
+        res.json({'Credentials': 'Incorrect'});
         return next(error);
       }
 
@@ -83,7 +74,8 @@ exports.manager_login_post = async function(req,res,next){
           const token = jwt.sign({user: body}, 'TOP_SECRET', {expiresIn: '1h'});
           
           //We return the token which will be used to access certain routes
-          return res.json({ token });
+          //return res.cookie("SESSIONID", token, {httpOnly: true, secure: true});
+          return res.json({token});
         }
       );
     }catch{
@@ -111,7 +103,7 @@ exports.secure_manager_create_task = function(req,res,next){
 
   task.save(function(err){
     if(err){ return next(err); }
-    res.send('task saved successfully');
+    res.json({'task': 'saved succesfully'});
   })
 }
 
@@ -143,7 +135,65 @@ exports.secure_manager_check_task = function(req,res,next){
 
     Task.findByIdAndUpdate(req.params.id, newTask, {}, function(err, nTask){
       if(err){ return next(err); }
-      res.send('Task updated successfully');
+      res.json({'Task updated': 'successfully'});
     })
+  })
+}
+
+exports.secure_manager_delete_post = function(req,res,next){
+  Task.findById(req.params.id)
+  .exec(function(err,task){
+      if(err){return next(err);}
+      if(!task){
+          res.json({"task": "Could not be found"});
+          return;
+      }
+
+      if(task.worker){
+        Worker.findById(task.worker)
+        .exec(function(err,worker){
+          if(err){return next(err);}
+          if(!worker){
+              res.json({"Worker": "Doesn't exist"});
+          }else{
+            const index = worker.tasks_doing.indexOf(task._id);
+            console.log(worker.tasks_doing);
+            console.log(index);
+            if(index > -1){
+                worker.tasks_doing.splice(index,1);
+            }
+
+            Worker.findByIdAndUpdate(worker._id, worker, {}, function(err, nwork){
+                if(err){return next(err);}
+            })
+          }
+        })
+      }
+      
+      if(task.manager){
+        Manager.findById(task.manager)
+        .exec(function(err,manager){
+          if(err){return next(err);}
+          if(!manager){
+              res.json({"Manager": "Doesn't exist"});
+          }else{
+              const index =   manager.tasks_assigned.indexOf(task._id);
+              console.log(index);
+              if(index > -1){
+                  manager.tasks_assigned.splice(index,1);
+              }
+
+              Manager.findByIdAndUpdate(manager._id, manager, {}, function(err, nmanage){
+                  if(err){return next(err);}
+              })
+          }
+        })
+      }
+      
+
+      Task.findByIdAndRemove(req.params.id, function deleteTask(err){
+          if(err){ return next(err); }
+          res.json({"task": "deleted"});
+      })
   })
 }

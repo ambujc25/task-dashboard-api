@@ -1,4 +1,6 @@
 var Task = require('../models/Task');
+var Worker = require('../models/Worker');
+var Manager = require('../models/Manager');
 
 exports.task_get_all = function(req,res,next){
     Task.find()
@@ -14,6 +16,7 @@ exports.task_get_all = function(req,res,next){
 exports.task_get_specific = function(req,res,next){
     Task.findById(req.params.id)
     .populate('manager')
+    .populate('worker')
     .exec(function(err, task){
         if(err){ return next(err); }
         res.setHeader('Content-Type', 'application/json');
@@ -36,3 +39,4 @@ exports.task_create_post = function(req,res,next){
         res.redirect('/');
     })
 }
+
