@@ -1,4 +1,5 @@
 var mongoose = require('mongoose');
+var bcrypt = require('bcrypt');
 
 var Schema = mongoose.Schema;
 
@@ -16,6 +17,24 @@ ManagerSchema
 .get(function () {
   return '/manager/get/' + this._id;
 });
+
+ManagerSchema.pre(
+  'save',
+  async function(next) {
+    //const user = this;
+    const hash = await bcrypt.hash(this.password, 10);
+
+    this.password = hash;
+    next();
+  }
+);
+
+ManagerSchema.methods.isValidPassword = async function(password){
+  const manager = this;
+  const compare = await bcrypt.compare(password, manager.password);
+
+  return compare;
+}
 
 //Export model
 module.exports = mongoose.model('Manager', ManagerSchema);

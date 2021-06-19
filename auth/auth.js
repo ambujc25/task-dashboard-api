@@ -25,10 +25,12 @@ passport.use(
             return done(null, false, { message: 'User not found' });
           }
 
-          if(password === user.password){
+          /*if(password === user.password){
               validate = true;
-          }
+          }*/
   
+          validate = await user.isValidPassword(password);
+
           if (!validate) {
             console.log(user);
             return done(null, false, { message: "Incorrect Password" });
@@ -59,9 +61,11 @@ passport.use(
             return done(null, false, { message: 'User not found' });
           }
 
-          if(password === user.password){
+          /*if(password === user.password){
               validate = true;
-          }
+          }*/
+
+          validate = await user.isValidPassword(password);
   
           if (!validate) {
             console.log(user);
