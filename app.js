@@ -21,8 +21,8 @@ var Manager = require('./models/Manager');
 var app = express();
 
 var mongoose = require('mongoose');
-//var mongoDB = 'mongodb+srv://jil25:moserbaer@cluster0.4cipe.mongodb.net/netmeds_assignment?retryWrites=true&w=majority';
-var mongoDB = 'mongodb+srv://jil25:moserbaer@cluster0.4cipe.mongodb.net/netmeds_2?retryWrites=true&w=majority'
+//var mongoDB = 'mongodb+srv://jil25:@cluster0.4cipe.mongodb.net/netmeds_assignment?retryWrites=true&w=majority';
+var mongoDB = 'mongodb+srv://jil25:@cluster0.4cipe.mongodb.net/netmeds_2?retryWrites=true&w=majority'
 
 mongoose.connect(mongoDB, { useNewUrlParser: true, useUnifiedTopology: true });
 var db = mongoose.connection;

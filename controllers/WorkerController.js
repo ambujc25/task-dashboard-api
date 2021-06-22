@@ -24,6 +24,8 @@ exports.worker_create_post = function(req,res,next){
       
 }
 
+//Get the list of all workers
+//worker/get_all
 exports.worker_get_all = function(req,res,next){
     Worker.find()
     .sort([['first_name','ascending']])
@@ -34,6 +36,8 @@ exports.worker_get_all = function(req,res,next){
     })
 }
 
+//Get the details of some specific worker using the _id
+//worker/get/:id
 exports.worker_get_specific = function(req,res,next){
     Worker.findById(req.params.id)
     .populate('tasks_doing')
@@ -44,23 +48,8 @@ exports.worker_get_specific = function(req,res,next){
     })
 }
 
-/*exports.worker_create_post = function(req,res,next){
-    var worker = new Worker({
-        first_name: 'Rohan',
-        last_name: 'Joshi',
-        tasks_doing: ['60c8fa711f93b03a98e877b1'],
-        email: 'rohanjoshi@gmail.com',
-        password: 'whereaib'
-    })
-
-    worker.save(function(err){
-        if(err){return next(err);}
-        res.redirect('/');
-    })
-}*/
-
-
-  
+//Worker login
+//worker/login
 exports.worker_login_post = async function(req,res,next){
 
 //This runs the middlware function in the auth file, which checks if the credentials are correct
